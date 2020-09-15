@@ -4,6 +4,8 @@ import io.InOut;
 
 public class AppJogo {
 
+	private static int tamLogico = 0, tiroPos;
+
 	public static void main(String[] args) {
 
 		Bola[] bolas = new Bola[5];
@@ -44,10 +46,9 @@ public class AppJogo {
 
 		for (int i = 0; i < bolas.length; i++) {
 			bolas[i] = new Bola(gerarNumAleatorio(1, 5), gerarNumAleatorio(1, 5));
-
+			tamLogico++;
 			// Checar no vetor se as posições das bola repetem
 			if (i > 0) {
-
 				// Caso repita, gerar uma nova posicao e comparar com as existentes no vetor
 				if (comparaPosBola(bolas, i)) {
 					do {
@@ -56,10 +57,8 @@ public class AppJogo {
 						comparaPosBola(bolas, i);
 
 					} while (comparaPosBola(bolas, i));
-
 				}
 			}
-
 		}
 	}
 
@@ -68,7 +67,6 @@ public class AppJogo {
 		if (min >= max) {
 			throw new IllegalArgumentException("Máximo menor que o mínimo");
 		}
-
 		return (int) (Math.random() * ((max - min) + 1)) + min;
 	}
 
@@ -76,14 +74,15 @@ public class AppJogo {
 
 		boolean acertou = false;
 		for (int i = 0; i < bolas.length; i++) {
-			//Se acertou a posicao
+			// Se acertou a posicao
 			if (bolas[i].acerta(x, y)) {
 				Bola.vida--;
 				acertou = true;
-				do {
-					reporBola(bolas[i]);
+				tiroPos = i;
+				do{
+					reporBola(bolas[i], x, y);
 					comparaPosBola(bolas, i);
-				} while (comparaPosBola(bolas, i)); //enquanto a nova posicao ja existir no vetor
+				}while (comparaPosBola(bolas, i)); // enquanto a nova posicao ja existir no vetor
 			}
 		}
 		if (acertou) {
@@ -95,22 +94,24 @@ public class AppJogo {
 		}
 	}
 
-	private static void reporBola(Bola bola) {
-		bola.setPosx(gerarNumAleatorio(1, 5));
-		bola.setPosy(gerarNumAleatorio(1, 5));
-
+	private static void reporBola(Bola bola, int x, int y) {
+		do {
+			bola.setPosx(gerarNumAleatorio(1, 5));
+			bola.setPosy(gerarNumAleatorio(1, 5));
+		} while (bola.getPosx() == x && bola.getPosy() == y);
 	}
 
 	private static boolean comparaPosBola(Bola[] bolas, int i) {
 		boolean achou = false;
-		
-		//Roda o vetor e procura posicao igual
-		for (int j = i - 1; j == 0; j--) {
-			if ((bolas[i].getPosx() == bolas[j].getPosx()) && (bolas[i].getPosy() == bolas[j].getPosy())) {
+
+		// Roda o vetor e procura posicao igual
+		for (int j = 0; j < tamLogico - 1; j++) {
+		// Pular a posicao do tiro certo para não entrar em loop.
+			if (j == tiroPos) {}
+
+			else if ((bolas[i].getPosx() == bolas[j].getPosx()) && (bolas[i].getPosy() == bolas[j].getPosy())) {
 				achou = true;
-
 			}
-
 		}
 		return achou;
 	}
